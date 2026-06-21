@@ -3,21 +3,58 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>管理者ページ｜ヤマトコスモス</title>
-<script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
+<title>管理者ログイン｜ヤマトコスモス</title>
+<link rel="stylesheet" href="../style.css">
+<style>
+  body { background-color: #eef1fa; }
+  .admin-wrap { max-width: 420px; margin: 60px auto; background: #fff; border-radius: 8px; box-shadow: 0 3px 10px rgba(40,60,120,0.15); padding: 28px; }
+  .admin-wrap h1 { color: #2e3f73; font-size: 18px; margin: 0 0 18px 0; }
+  .admin-wrap label { display: block; font-weight: bold; font-size: 13px; color: #2e3f73; margin: 0 0 6px; }
+  .admin-wrap input[type="password"] {
+    width: 100%; padding: 9px 10px; border: 1px solid #b6c0e0; border-radius: 3px; font-size: 13px;
+  }
+  .admin-wrap button { margin-top: 16px; width: 100%; background: linear-gradient(135deg, #6c84c4 0%, #4a63a8 100%); color: #fff; font-weight: bold; padding: 10px; border: none; border-radius: 4px; cursor: pointer; }
+  #login-status { margin-top: 12px; font-size: 13px; color: #d6433d; }
+</style>
 </head>
 <body>
-<script src="https://unpkg.com/decap-cms@^3.0.0/dist/decap-cms.js"></script>
+<div class="admin-wrap">
+  <h1>ヤマトコスモス 管理者ログイン</h1>
+  <label for="password">パスワード</label>
+  <input type="password" id="password" autocomplete="off">
+  <button id="login-btn">ログインして編集する</button>
+  <div id="login-status"></div>
+</div>
+
 <script>
-  if (window.netlifyIdentity) {
-    window.netlifyIdentity.on("init", function (user) {
-      if (!user) {
-        window.netlifyIdentity.on("login", function () {
-          document.location.href = "/admin/";
-        });
-      }
-    });
-  }
+  document.getElementById("login-btn").addEventListener("click", function () {
+    var pw = document.getElementById("password").value;
+    var statusEl = document.getElementById("login-status");
+    if (!pw) return;
+    statusEl.textContent = "確認中...";
+
+    fetch("/.netlify/functions/verify-password", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ password: pw })
+    })
+      .then(function (res) { return res.json().then(function (data) { return { ok: res.ok, data: data }; }); })
+      .then(function (result) {
+        if (!result.ok || !result.data.ok) {
+          statusEl.textContent = "パスワードが違います";
+          return;
+        }
+        sessionStorage.setItem("ck_admin_pw", pw);
+        location.href = "../index.html";
+      })
+      .catch(function (err) {
+        statusEl.textContent = "エラー: " + err;
+      });
+  });
+
+  document.getElementById("password").addEventListener("keydown", function (e) {
+    if (e.key === "Enter") document.getElementById("login-btn").click();
+  });
 </script>
 </body>
 </html>

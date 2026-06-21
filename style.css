@@ -591,6 +591,20 @@ a.contact-button:hover {
   color: #ffffff;
 }
 
+.admin-link {
+  display: block;
+  margin-top: 8px;
+  font-size: 10px;
+  color: #5a6a96;
+  opacity: 0.6;
+  text-decoration: none;
+}
+
+.admin-link:hover {
+  color: #cfd8f0;
+  opacity: 1;
+}
+
 @media (max-width: 760px) {
   .hero-section {
     grid-template-columns: 1fr;
@@ -624,4 +638,110 @@ a.contact-button:hover {
     width: 100%;
     justify-content: space-between;
   }
+}
+
+/* ===== 編集モード ===== */
+body.ck-edit-mode {
+  padding-bottom: 60px;
+}
+
+.ck-relative {
+  position: relative !important;
+}
+
+.ck-pencil {
+  position: absolute;
+  top: -10px;
+  right: -10px;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background-color: #ffffff;
+  border: 1px solid #c7d0ea;
+  box-shadow: 0 2px 5px rgba(40, 60, 120, 0.25);
+  font-size: 13px;
+  line-height: 1;
+  cursor: pointer;
+  z-index: 5;
+}
+
+.ck-pencil:hover {
+  background-color: #eef1fa;
+}
+
+[data-ck] {
+  position: relative;
+  outline: 1px dashed transparent;
+}
+
+body.ck-edit-mode [data-ck]:not([data-ck-attr]) {
+  outline: 1px dashed #b6c0e0;
+  padding-right: 4px;
+}
+
+.ck-edit-box {
+  width: 100%;
+  font: inherit;
+  color: inherit;
+  padding: 4px 6px;
+  border: 1px solid #6c84c4;
+  border-radius: 3px;
+  box-sizing: border-box;
+}
+
+.ck-image-wrap {
+  position: relative;
+  display: inline-block;
+}
+
+.ck-image-wrap img {
+  display: block;
+}
+
+.ck-pencil-image {
+  top: 6px;
+  right: 6px;
+}
+
+#ck-save-bar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background-color: #2e3f73;
+  color: #ffffff;
+  padding: 12px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: 13px;
+  z-index: 1000;
+  box-shadow: 0 -2px 8px rgba(0,0,0,0.2);
+}
+
+#ck-save-status {
+  flex: 1;
+}
+
+#ck-save-btn, #ck-logout-btn {
+  border: none;
+  border-radius: 4px;
+  padding: 8px 18px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+#ck-save-btn {
+  background-color: #ee5a36;
+  color: #ffffff;
+}
+
+#ck-save-btn.ck-dirty {
+  background-color: #ff8a3c;
+}
+
+#ck-logout-btn {
+  background-color: #4a63a8;
+  color: #ffffff;
 }
