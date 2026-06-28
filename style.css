@@ -23,10 +23,8 @@ a:hover {
 }
 
 .page-wrap {
-  max-width: 1080px;
-  margin: 0 auto;
+  width: 100%;
   background-color: #ffffff;
-  box-shadow: 0 0 0 1px #c7d0ea, 0 6px 18px rgba(40, 60, 120, 0.12);
 }
 
 /* ===== トップバー（ロゴ＋連絡先） ===== */
@@ -151,7 +149,14 @@ a:hover {
   display: grid;
   grid-template-columns: 260px 1fr;
   gap: 18px;
+  max-width: 1080px;
+  margin: 0 auto;
   padding: 22px 24px;
+  background-color: #f4f6fc;
+  border-bottom: 1px solid #e2e6f3;
+}
+
+.hero-section-bg {
   background-color: #f4f6fc;
   border-bottom: 1px solid #e2e6f3;
 }
@@ -337,6 +342,8 @@ a:hover {
 
 /* ===== メインコンテンツ ===== */
 .content {
+  max-width: 1080px;
+  margin: 0 auto;
   padding: 28px 28px 36px;
 }
 
