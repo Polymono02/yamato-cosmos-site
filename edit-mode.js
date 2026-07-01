@@ -189,9 +189,19 @@
     return Array.from(grid.querySelectorAll(".products-item")).map(function (fig) {
       var img = fig.querySelector(".products-photo");
       var cap = fig.querySelector("figcaption");
+      var name = "";
+      if (cap) {
+        name = cap.getAttribute("data-name-text");
+        if (name === null) {
+          name = Array.from(cap.childNodes)
+            .filter(function (n) { return n.nodeType === Node.TEXT_NODE; })
+            .map(function (n) { return n.textContent; })
+            .join("").trim();
+        }
+      }
       return {
         photo: (img && img.getAttribute("data-photo-path")) || "",
-        name: (cap && (cap.getAttribute("data-name-text") || cap.textContent.replace("✏️", "").trim())) || ""
+        name: name || ""
       };
     });
   }
@@ -324,14 +334,17 @@
     var name = document.createElement("div");
     name.className = "eq-name";
     name.textContent = item.name || "";
+    name.setAttribute("data-eq-name", item.name || "");
 
     var desc = document.createElement("div");
     desc.className = "eq-desc";
     desc.textContent = item.desc || "";
+    desc.setAttribute("data-eq-desc", item.desc || "");
 
     var price = document.createElement("div");
     price.className = "eq-price";
     price.textContent = item.price || "";
+    price.setAttribute("data-eq-price", item.price || "");
 
     var contact = document.createElement("div");
     contact.className = "eq-contact";
@@ -343,14 +356,17 @@
     var cName = document.createElement("span");
     cName.className = "eq-contact-name";
     cName.textContent = item.contactName || "";
+    cName.setAttribute("data-eq-cname", item.contactName || "");
 
     var cTel = document.createElement("span");
     cTel.className = "eq-contact-tel";
     cTel.textContent = item.contactTel || "";
+    cTel.setAttribute("data-eq-ctel", item.contactTel || "");
 
     var cEmail = document.createElement("span");
     cEmail.className = "eq-contact-email";
     cEmail.textContent = item.contactEmail || "";
+    cEmail.setAttribute("data-eq-cemail", item.contactEmail || "");
 
     contact.appendChild(cLabel);
     contact.appendChild(cName);
@@ -376,17 +392,24 @@
       var cName = card.querySelector(".eq-contact-name");
       var cTel = card.querySelector(".eq-contact-tel");
       var cEmail = card.querySelector(".eq-contact-email");
-      function getText(el, attr) {
-        return el ? (el.getAttribute(attr) || el.textContent.replace("✏️", "").trim()) : "";
+      function getAttr(el, attr) {
+        // data-* 属性を最優先。未設定の場合はテキストノードだけを結合（ボタンなど要素ノードを除外）
+        if (!el) return "";
+        var v = el.getAttribute(attr);
+        if (v !== null) return v;
+        return Array.from(el.childNodes)
+          .filter(function (n) { return n.nodeType === Node.TEXT_NODE; })
+          .map(function (n) { return n.textContent; })
+          .join("").trim();
       }
       return {
         photo: (img && img.getAttribute("data-photo-path")) || "",
-        name: getText(name, "data-eq-name"),
-        desc: getText(desc, "data-eq-desc"),
-        price: getText(price, "data-eq-price"),
-        contactName: getText(cName, "data-eq-cname"),
-        contactTel: getText(cTel, "data-eq-ctel"),
-        contactEmail: getText(cEmail, "data-eq-cemail")
+        name: getAttr(name, "data-eq-name"),
+        desc: getAttr(desc, "data-eq-desc"),
+        price: getAttr(price, "data-eq-price"),
+        contactName: getAttr(cName, "data-eq-cname"),
+        contactTel: getAttr(cTel, "data-eq-ctel"),
+        contactEmail: getAttr(cEmail, "data-eq-cemail")
       };
     });
   }

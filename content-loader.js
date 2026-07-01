@@ -82,14 +82,17 @@
           var name = document.createElement("div");
           name.className = "eq-name";
           name.textContent = item.name || "";
+          name.setAttribute("data-eq-name", item.name || "");
 
           var desc = document.createElement("div");
           desc.className = "eq-desc";
           desc.textContent = item.desc || "";
+          desc.setAttribute("data-eq-desc", item.desc || "");
 
           var price = document.createElement("div");
           price.className = "eq-price";
           price.textContent = item.price || "";
+          price.setAttribute("data-eq-price", item.price || "");
 
           var contact = document.createElement("div");
           contact.className = "eq-contact";
@@ -101,14 +104,17 @@
           var cName = document.createElement("span");
           cName.className = "eq-contact-name";
           cName.textContent = item.contactName || "";
+          cName.setAttribute("data-eq-cname", item.contactName || "");
 
           var cTel = document.createElement("span");
           cTel.className = "eq-contact-tel";
           cTel.textContent = item.contactTel || "";
+          cTel.setAttribute("data-eq-ctel", item.contactTel || "");
 
           var cEmail = document.createElement("span");
           cEmail.className = "eq-contact-email";
           cEmail.textContent = item.contactEmail || "";
+          cEmail.setAttribute("data-eq-cemail", item.contactEmail || "");
 
           contact.appendChild(cLabel);
           contact.appendChild(cName);
