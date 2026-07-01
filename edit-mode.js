@@ -14,6 +14,10 @@
     if (slideshow) {
       attachSlideshowPencil(slideshow);
     }
+    var gachaGrid = document.getElementById("products-gacha-grid");
+    var vendGrid = document.getElementById("products-vend-grid");
+    if (gachaGrid) enableProductsGridEditing(gachaGrid);
+    if (vendGrid) enableProductsGridEditing(vendGrid);
   }
 
   function ensureRelative(el) {
@@ -51,7 +55,6 @@
     box.value = el.getAttribute("data-ck-text") || el.textContent.trim();
 
     var pencil = el.querySelector(".ck-pencil");
-    var original = el.textContent;
     el.setAttribute("data-ck-editing", "true");
     Array.from(el.childNodes).forEach(function (n) {
       if (n !== pencil) n.remove();
@@ -128,6 +131,128 @@
     slideshowEl.appendChild(pencil);
     slideshowEl.appendChild(fileInput);
   }
+
+  // ===== 設置事例ギャラリー編集 =====
+
+  function enableProductsGridEditing(grid) {
+    Array.from(grid.querySelectorAll(".products-item")).forEach(function (fig) {
+      attachProductsItemControls(fig);
+    });
+    addProductsAddButton(grid);
+  }
+
+  function attachProductsItemControls(fig) {
+    var img = fig.querySelector(".products-photo");
+    var cap = fig.querySelector("figcaption");
+
+    // 写真変更ボタン
+    var fileInput = makeFileInput(function (file) {
+      readAndUpload(file, function (newPath) {
+        img.src = newPath;
+        img.setAttribute("data-photo-path", newPath);
+        markDirty();
+      });
+    });
+    var photoPencil = makePencilButton("写真を変更", function () {
+      fileInput.click();
+    });
+    photoPencil.classList.add("ck-pencil-image");
+    fig.appendChild(photoPencil);
+    fig.appendChild(fileInput);
+
+    // 名前編集ボタン（キャプションの横にインライン表示）
+    var namePencil = document.createElement("button");
+    namePencil.className = "ck-pencil ck-pencil-caption";
+    namePencil.type = "button";
+    namePencil.title = "名前を編集";
+    namePencil.textContent = "✏️";
+    namePencil.addEventListener("click", function (e) {
+      e.preventDefault();
+      e.stopPropagation();
+      startProductsNameEdit(cap, namePencil);
+    });
+    cap.appendChild(namePencil);
+
+    // 削除ボタン
+    var delBtn = document.createElement("button");
+    delBtn.className = "ck-delete-item";
+    delBtn.type = "button";
+    delBtn.title = "削除";
+    delBtn.textContent = "✕";
+    delBtn.addEventListener("click", function (e) {
+      e.preventDefault();
+      if (confirm("この項目を削除しますか？")) {
+        fig.remove();
+        markDirty();
+      }
+    });
+    fig.appendChild(delBtn);
+  }
+
+  function startProductsNameEdit(cap, pencil) {
+    if (cap.querySelector(".ck-edit-box")) return;
+    var current = cap.getAttribute("data-name-text") ||
+      cap.textContent.replace("✏️", "").trim();
+    var box = document.createElement("input");
+    box.type = "text";
+    box.className = "ck-edit-box";
+    box.value = current;
+
+    Array.from(cap.childNodes).forEach(function (n) { if (n !== pencil) n.remove(); });
+    cap.insertBefore(box, pencil);
+    box.focus();
+
+    function commit() {
+      var value = box.value;
+      cap.setAttribute("data-name-text", value);
+      box.remove();
+      cap.insertBefore(document.createTextNode(value), pencil);
+      markDirty();
+    }
+    box.addEventListener("blur", commit);
+    box.addEventListener("keydown", function (e) {
+      if (e.key === "Enter") { e.preventDefault(); box.blur(); }
+    });
+  }
+
+  function addProductsAddButton(grid) {
+    var wrapper = document.createElement("div");
+    wrapper.className = "products-add-wrapper";
+    var addBtn = document.createElement("button");
+    addBtn.className = "ck-add-item";
+    addBtn.type = "button";
+    addBtn.textContent = "＋ 追加";
+    addBtn.addEventListener("click", function () {
+      var fig = document.createElement("figure");
+      fig.className = "products-item";
+      var img = document.createElement("img");
+      img.src = "";
+      img.setAttribute("data-photo-path", "");
+      img.className = "products-photo";
+      var cap = document.createElement("figcaption");
+      cap.textContent = "";
+      fig.appendChild(img);
+      fig.appendChild(cap);
+      grid.insertBefore(fig, wrapper);
+      attachProductsItemControls(fig);
+      markDirty();
+    });
+    wrapper.appendChild(addBtn);
+    grid.appendChild(wrapper);
+  }
+
+  function collectProductsItems(grid) {
+    return Array.from(grid.querySelectorAll(".products-item")).map(function (fig) {
+      var img = fig.querySelector(".products-photo");
+      var cap = fig.querySelector("figcaption");
+      return {
+        photo: (img && img.getAttribute("data-photo-path")) || "",
+        name: (cap && (cap.getAttribute("data-name-text") || cap.textContent.replace("✏️", "").trim())) || ""
+      };
+    });
+  }
+
+  // ===== 共通ユーティリティ =====
 
   function makeFileInput(onFile) {
     var fileInput = document.createElement("input");
@@ -246,6 +371,15 @@
             return img.getAttribute("data-slide-path") || img.getAttribute("src");
           });
           contentData.slideshow = paths;
+        }
+
+        // 設置事例ギャラリー保存
+        var gachaGrid = document.getElementById("products-gacha-grid");
+        var vendGrid = document.getElementById("products-vend-grid");
+        if (gachaGrid || vendGrid) {
+          contentData.products = contentData.products || {};
+          if (gachaGrid) contentData.products.gacha = collectProductsItems(gachaGrid);
+          if (vendGrid) contentData.products.vend = collectProductsItems(vendGrid);
         }
 
         return fetch("/.netlify/functions/save-content", {

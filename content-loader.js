@@ -32,6 +32,31 @@
         });
       }
 
+      // 設置事例ギャラリー
+      function renderProductsGrid(gridId, items) {
+        var grid = document.getElementById(gridId);
+        if (!grid) return;
+        grid.innerHTML = "";
+        (items || []).forEach(function (item) {
+          var fig = document.createElement("figure");
+          fig.className = "products-item";
+          var img = document.createElement("img");
+          img.src = item.photo || "";
+          img.setAttribute("data-photo-path", item.photo || "");
+          img.alt = item.name || "";
+          img.className = "products-photo";
+          var cap = document.createElement("figcaption");
+          cap.textContent = item.name || "";
+          fig.appendChild(img);
+          fig.appendChild(cap);
+          grid.appendChild(fig);
+        });
+      }
+      if (data.products) {
+        renderProductsGrid("products-gacha-grid", data.products.gacha);
+        renderProductsGrid("products-vend-grid", data.products.vend);
+      }
+
       document.dispatchEvent(new CustomEvent("content-loaded"));
     })
     .catch(function (err) {
