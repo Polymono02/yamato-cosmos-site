@@ -38,7 +38,26 @@
   },
   "equipment": {
     "intro": "ガチャ機械・自動販売機など、リースでご提供している機材の一覧です。設置スペースやご用途に応じてお選びいただけます。詳しい仕様やレンタル条件はお気軽にお問い合わせください。",
-    "items": []
+    "items": [
+      {
+        "photo": "images/uploads/1782925015582-IMG_3051.png",
+        "name": "ドリーミー200　200円ガチャ機",
+        "desc": "1994年頃より、株式会社ユウが製造を始めた200円専用ガチャ機です。　2連機、４連機　どちらもございます。",
+        "price": "",
+        "contactName": "小倉",
+        "contactTel": "080-9983-7810",
+        "contactEmail": "q72197742@gmail.com"
+      },
+      {
+        "photo": "",
+        "name": "",
+        "desc": "",
+        "price": "",
+        "contactName": "",
+        "contactTel": "",
+        "contactEmail": ""
+      }
+    ]
   },
   "products": {
     "gacha": [
