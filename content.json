@@ -48,7 +48,12 @@
     "vend2Body": "お菓子や軽食を取り扱う自動販売機です。"
   },
   "products": {
-    "gacha": [],
+    "gacha": [
+      {
+        "photo": "images/uploads/1782923576382-IMG_3045.png",
+        "name": ""
+      }
+    ],
     "vend": []
   },
   "slideshow": [
