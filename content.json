@@ -56,6 +56,15 @@
         "contactName": "小倉",
         "contactTel": "080-9983-7810",
         "contactEmail": "q72197742@gmail.com"
+      },
+      {
+        "photo": "",
+        "name": "テスト",
+        "desc": "",
+        "price": "",
+        "contactName": "",
+        "contactTel": "",
+        "contactEmail": ""
       }
     ]
   },
