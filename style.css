@@ -753,6 +753,124 @@ body.ck-edit-mode [data-ck]:not([data-ck-attr]) {
   color: #ffffff;
 }
 
+/* ===== 貸し出し機器一覧 ===== */
+#equipment-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.eq-card {
+  display: grid;
+  grid-template-columns: 180px 1fr;
+  gap: 18px;
+  align-items: start;
+  background-color: #f7f9fd;
+  border: 1px solid #c7d0ea;
+  border-radius: 8px;
+  padding: 16px;
+  box-shadow: 0 2px 6px rgba(40, 60, 120, 0.08);
+  position: relative;
+}
+
+.eq-photo-wrap {
+  position: relative;
+  width: 180px;
+}
+
+.eq-photo {
+  width: 180px;
+  height: 140px;
+  object-fit: cover;
+  border-radius: 4px;
+  display: block;
+}
+
+.eq-photo[src=""] {
+  background: repeating-linear-gradient(45deg, #eef1fa, #eef1fa 10px, #e3e8f7 10px, #e3e8f7 20px);
+  border: 1px dashed #a9b6dc;
+  min-height: 140px;
+}
+
+.eq-body {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.eq-name {
+  font-size: 17px;
+  font-weight: bold;
+  color: #2e3f73;
+  position: relative;
+  padding-right: 28px;
+}
+
+.eq-desc {
+  font-size: 13px;
+  color: #555555;
+  line-height: 1.6;
+  position: relative;
+  padding-right: 28px;
+}
+
+.eq-price {
+  font-size: 15px;
+  font-weight: bold;
+  color: #ee5a36;
+  position: relative;
+  padding-right: 28px;
+}
+
+.eq-contact {
+  font-size: 12px;
+  color: #666666;
+  border-top: 1px dotted #c7d0ea;
+  padding-top: 8px;
+  margin-top: 4px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+}
+
+.eq-contact-label {
+  font-weight: bold;
+  color: #2e3f73;
+  white-space: nowrap;
+}
+
+.eq-contact-name,
+.eq-contact-tel,
+.eq-contact-email {
+  position: relative;
+  white-space: nowrap;
+}
+
+.eq-contact-tel::before { content: "TEL："; color: #888; }
+.eq-contact-email::before { content: "Mail："; color: #888; }
+
+.eq-add-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  border: 2px dashed #a9b6dc;
+  border-radius: 8px;
+  background-color: #f7f9fd;
+}
+
+@media (max-width: 600px) {
+  .eq-card {
+    grid-template-columns: 1fr;
+  }
+  .eq-photo-wrap,
+  .eq-photo {
+    width: 100%;
+  }
+}
+
 /* ===== 設置事例ギャラリー編集コントロール ===== */
 .products-item {
   position: relative;

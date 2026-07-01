@@ -11,18 +11,23 @@
     addSaveBar();
     document.querySelectorAll("[data-ck]").forEach(attachTextPencil);
     var slideshow = document.getElementById("hero-slideshow");
-    if (slideshow) {
-      attachSlideshowPencil(slideshow);
-    }
+    if (slideshow) attachSlideshowPencil(slideshow);
+
+    // 設置事例ギャラリー
     var gachaGrid = document.getElementById("products-gacha-grid");
     var vendGrid = document.getElementById("products-vend-grid");
     if (gachaGrid) enableProductsGridEditing(gachaGrid);
     if (vendGrid) enableProductsGridEditing(vendGrid);
+
+    // 貸し出し機器一覧
+    var eqList = document.getElementById("equipment-list");
+    if (eqList) enableEquipmentEditing(eqList);
   }
 
+  // ===== テキスト編集 =====
+
   function ensureRelative(el) {
-    var style = window.getComputedStyle(el);
-    if (style.position === "static") {
+    if (window.getComputedStyle(el).position === "static") {
       el.classList.add("ck-relative");
     }
   }
@@ -53,35 +58,28 @@
     box.className = "ck-edit-box";
     if (!isMultiline) box.type = "text";
     box.value = el.getAttribute("data-ck-text") || el.textContent.trim();
-
     var pencil = el.querySelector(".ck-pencil");
     el.setAttribute("data-ck-editing", "true");
-    Array.from(el.childNodes).forEach(function (n) {
-      if (n !== pencil) n.remove();
-    });
+    Array.from(el.childNodes).forEach(function (n) { if (n !== pencil) n.remove(); });
     el.insertBefore(box, pencil);
     box.focus();
-
     function commit() {
       var value = box.value;
       el.setAttribute("data-ck-text", value);
       box.remove();
       el.removeAttribute("data-ck-editing");
-      var textNode = document.createTextNode(value);
-      el.insertBefore(textNode, pencil);
+      el.insertBefore(document.createTextNode(value), pencil);
       markDirty();
     }
-
     box.addEventListener("blur", commit);
     box.addEventListener("keydown", function (e) {
-      if (e.key === "Enter" && !isMultiline) {
-        e.preventDefault();
-        box.blur();
-      }
+      if (e.key === "Enter" && !isMultiline) { e.preventDefault(); box.blur(); }
     });
   }
 
-  function attachImagePencil(imgEl, ckKey) {
+  // ===== 画像編集 =====
+
+  function attachImagePencil(imgEl) {
     var wrapper = imgEl.parentElement;
     if (!wrapper.classList.contains("ck-image-wrap")) {
       var box = document.createElement("span");
@@ -91,7 +89,6 @@
       wrapper = box;
     }
     if (wrapper.querySelector(".ck-pencil")) return;
-
     var fileInput = makeFileInput(function (file) {
       readAndUpload(file, function (newPath) {
         imgEl.src = newPath;
@@ -99,53 +96,39 @@
         markDirty();
       });
     });
-
-    var pencil = makePencilButton("画像を変更", function () {
-      fileInput.click();
-    });
+    var pencil = makePencilButton("画像を変更", function () { fileInput.click(); });
     pencil.classList.add("ck-pencil-image");
-
     wrapper.appendChild(pencil);
     wrapper.appendChild(fileInput);
   }
 
+  // ===== スライドショー =====
+
   function attachSlideshowPencil(slideshowEl) {
     if (slideshowEl.querySelector(".ck-pencil")) return;
-
     var fileInput = makeFileInput(function (file) {
       readAndUpload(file, function (newPath) {
         var active = slideshowEl.querySelector(".slide.is-active") || slideshowEl.querySelector(".slide");
-        if (active) {
-          active.src = newPath;
-          active.setAttribute("data-slide-path", newPath);
-        }
+        if (active) { active.src = newPath; active.setAttribute("data-slide-path", newPath); }
         markDirty();
       });
     });
-
-    var pencil = makePencilButton("表示中の写真を変更", function () {
-      fileInput.click();
-    });
+    var pencil = makePencilButton("表示中の写真を変更", function () { fileInput.click(); });
     pencil.classList.add("ck-pencil-image");
-
     slideshowEl.appendChild(pencil);
     slideshowEl.appendChild(fileInput);
   }
 
-  // ===== 設置事例ギャラリー編集 =====
+  // ===== 設置事例ギャラリー =====
 
   function enableProductsGridEditing(grid) {
-    Array.from(grid.querySelectorAll(".products-item")).forEach(function (fig) {
-      attachProductsItemControls(fig);
-    });
+    Array.from(grid.querySelectorAll(".products-item")).forEach(attachProductsItemControls);
     addProductsAddButton(grid);
   }
 
   function attachProductsItemControls(fig) {
     var img = fig.querySelector(".products-photo");
     var cap = fig.querySelector("figcaption");
-
-    // 写真変更ボタン
     var fileInput = makeFileInput(function (file) {
       readAndUpload(file, function (newPath) {
         img.src = newPath;
@@ -153,14 +136,11 @@
         markDirty();
       });
     });
-    var photoPencil = makePencilButton("写真を変更", function () {
-      fileInput.click();
-    });
+    var photoPencil = makePencilButton("写真を変更", function () { fileInput.click(); });
     photoPencil.classList.add("ck-pencil-image");
     fig.appendChild(photoPencil);
     fig.appendChild(fileInput);
 
-    // 名前編集ボタン（キャプションの横にインライン表示）
     var namePencil = document.createElement("button");
     namePencil.className = "ck-pencil ck-pencil-caption";
     namePencil.type = "button";
@@ -169,50 +149,14 @@
     namePencil.addEventListener("click", function (e) {
       e.preventDefault();
       e.stopPropagation();
-      startProductsNameEdit(cap, namePencil);
+      startInlineEdit(cap, namePencil, "data-name-text");
     });
     cap.appendChild(namePencil);
 
-    // 削除ボタン
-    var delBtn = document.createElement("button");
-    delBtn.className = "ck-delete-item";
-    delBtn.type = "button";
-    delBtn.title = "削除";
-    delBtn.textContent = "✕";
-    delBtn.addEventListener("click", function (e) {
-      e.preventDefault();
-      if (confirm("この項目を削除しますか？")) {
-        fig.remove();
-        markDirty();
-      }
+    var delBtn = makeDeleteButton(function () {
+      if (confirm("この項目を削除しますか？")) { fig.remove(); markDirty(); }
     });
     fig.appendChild(delBtn);
-  }
-
-  function startProductsNameEdit(cap, pencil) {
-    if (cap.querySelector(".ck-edit-box")) return;
-    var current = cap.getAttribute("data-name-text") ||
-      cap.textContent.replace("✏️", "").trim();
-    var box = document.createElement("input");
-    box.type = "text";
-    box.className = "ck-edit-box";
-    box.value = current;
-
-    Array.from(cap.childNodes).forEach(function (n) { if (n !== pencil) n.remove(); });
-    cap.insertBefore(box, pencil);
-    box.focus();
-
-    function commit() {
-      var value = box.value;
-      cap.setAttribute("data-name-text", value);
-      box.remove();
-      cap.insertBefore(document.createTextNode(value), pencil);
-      markDirty();
-    }
-    box.addEventListener("blur", commit);
-    box.addEventListener("keydown", function (e) {
-      if (e.key === "Enter") { e.preventDefault(); box.blur(); }
-    });
   }
 
   function addProductsAddButton(grid) {
@@ -252,6 +196,201 @@
     });
   }
 
+  // ===== 貸し出し機器一覧 =====
+
+  function enableEquipmentEditing(list) {
+    Array.from(list.querySelectorAll(".eq-card")).forEach(attachEquipmentCardControls);
+    addEquipmentAddButton(list);
+  }
+
+  function attachEquipmentCardControls(card) {
+    var photoWrap = card.querySelector(".eq-photo-wrap");
+    var img = card.querySelector(".eq-photo");
+    var name = card.querySelector(".eq-name");
+    var desc = card.querySelector(".eq-desc");
+    var price = card.querySelector(".eq-price");
+    var cName = card.querySelector(".eq-contact-name");
+    var cTel = card.querySelector(".eq-contact-tel");
+    var cEmail = card.querySelector(".eq-contact-email");
+
+    // 写真
+    var fileInput = makeFileInput(function (file) {
+      readAndUpload(file, function (newPath) {
+        img.src = newPath;
+        img.setAttribute("data-photo-path", newPath);
+        markDirty();
+      });
+    });
+    var photoPencil = makePencilButton("写真を変更", function () { fileInput.click(); });
+    photoPencil.classList.add("ck-pencil-image");
+    photoWrap.appendChild(photoPencil);
+    photoWrap.appendChild(fileInput);
+
+    // テキストフィールド各種
+    attachFieldPencil(name, "data-eq-name", false);
+    attachFieldPencil(desc, "data-eq-desc", true);
+    attachFieldPencil(price, "data-eq-price", false);
+    attachInlineFieldPencil(cName, "data-eq-cname", "担当者名");
+    attachInlineFieldPencil(cTel, "data-eq-ctel", "電話番号");
+    attachInlineFieldPencil(cEmail, "data-eq-cemail", "メールアドレス");
+
+    // 削除ボタン
+    var delBtn = makeDeleteButton(function () {
+      if (confirm("この機材を削除しますか？")) { card.remove(); markDirty(); }
+    });
+    card.appendChild(delBtn);
+  }
+
+  function attachFieldPencil(el, attr, multiline) {
+    if (!el) return;
+    el.style.position = "relative";
+    var pencil = makePencilButton("編集", function () { startInlineEdit(el, pencil, attr, multiline); });
+    el.appendChild(pencil);
+  }
+
+  function attachInlineFieldPencil(el, attr, placeholder) {
+    if (!el) return;
+    el.style.position = "relative";
+    var pencil = document.createElement("button");
+    pencil.className = "ck-pencil ck-pencil-caption";
+    pencil.type = "button";
+    pencil.title = placeholder + "を編集";
+    pencil.textContent = "✏️";
+    pencil.addEventListener("click", function (e) {
+      e.preventDefault();
+      e.stopPropagation();
+      startInlineEdit(el, pencil, attr, false, placeholder);
+    });
+    el.appendChild(pencil);
+  }
+
+  function startInlineEdit(el, pencil, attr, multiline, placeholder) {
+    if (el.querySelector(".ck-edit-box")) return;
+    var current = el.getAttribute(attr) || el.textContent.replace("✏️", "").trim();
+    var box = document.createElement(multiline ? "textarea" : "input");
+    box.className = "ck-edit-box";
+    if (!multiline) box.type = "text";
+    if (placeholder) box.placeholder = placeholder;
+    box.value = current;
+    Array.from(el.childNodes).forEach(function (n) { if (n !== pencil) n.remove(); });
+    el.insertBefore(box, pencil);
+    box.focus();
+    function commit() {
+      var value = box.value;
+      el.setAttribute(attr, value);
+      box.remove();
+      el.insertBefore(document.createTextNode(value), pencil);
+      markDirty();
+    }
+    box.addEventListener("blur", commit);
+    box.addEventListener("keydown", function (e) {
+      if (e.key === "Enter" && !multiline) { e.preventDefault(); box.blur(); }
+    });
+  }
+
+  function addEquipmentAddButton(list) {
+    var wrapper = document.createElement("div");
+    wrapper.className = "eq-add-wrapper";
+    var addBtn = document.createElement("button");
+    addBtn.className = "ck-add-item";
+    addBtn.type = "button";
+    addBtn.textContent = "＋ 機材を追加";
+    addBtn.addEventListener("click", function () {
+      var card = buildEquipmentCard({ photo: "", name: "", desc: "", price: "", contactName: "", contactTel: "", contactEmail: "" });
+      list.insertBefore(card, wrapper);
+      attachEquipmentCardControls(card);
+      markDirty();
+    });
+    wrapper.appendChild(addBtn);
+    list.appendChild(wrapper);
+  }
+
+  function buildEquipmentCard(item) {
+    var card = document.createElement("div");
+    card.className = "eq-card";
+
+    var photoWrap = document.createElement("div");
+    photoWrap.className = "eq-photo-wrap";
+    var img = document.createElement("img");
+    img.src = item.photo || "";
+    img.setAttribute("data-photo-path", item.photo || "");
+    img.className = "eq-photo";
+    img.alt = item.name || "";
+    photoWrap.appendChild(img);
+
+    var body = document.createElement("div");
+    body.className = "eq-body";
+
+    var name = document.createElement("div");
+    name.className = "eq-name";
+    name.textContent = item.name || "";
+
+    var desc = document.createElement("div");
+    desc.className = "eq-desc";
+    desc.textContent = item.desc || "";
+
+    var price = document.createElement("div");
+    price.className = "eq-price";
+    price.textContent = item.price || "";
+
+    var contact = document.createElement("div");
+    contact.className = "eq-contact";
+
+    var cLabel = document.createElement("span");
+    cLabel.className = "eq-contact-label";
+    cLabel.textContent = "担当：";
+
+    var cName = document.createElement("span");
+    cName.className = "eq-contact-name";
+    cName.textContent = item.contactName || "";
+
+    var cTel = document.createElement("span");
+    cTel.className = "eq-contact-tel";
+    cTel.textContent = item.contactTel || "";
+
+    var cEmail = document.createElement("span");
+    cEmail.className = "eq-contact-email";
+    cEmail.textContent = item.contactEmail || "";
+
+    contact.appendChild(cLabel);
+    contact.appendChild(cName);
+    contact.appendChild(cTel);
+    contact.appendChild(cEmail);
+
+    body.appendChild(name);
+    body.appendChild(desc);
+    body.appendChild(price);
+    body.appendChild(contact);
+
+    card.appendChild(photoWrap);
+    card.appendChild(body);
+    return card;
+  }
+
+  function collectEquipmentItems(list) {
+    return Array.from(list.querySelectorAll(".eq-card")).map(function (card) {
+      var img = card.querySelector(".eq-photo");
+      var name = card.querySelector(".eq-name");
+      var desc = card.querySelector(".eq-desc");
+      var price = card.querySelector(".eq-price");
+      var cName = card.querySelector(".eq-contact-name");
+      var cTel = card.querySelector(".eq-contact-tel");
+      var cEmail = card.querySelector(".eq-contact-email");
+      function getText(el, attr) {
+        return el ? (el.getAttribute(attr) || el.textContent.replace("✏️", "").trim()) : "";
+      }
+      return {
+        photo: (img && img.getAttribute("data-photo-path")) || "",
+        name: getText(name, "data-eq-name"),
+        desc: getText(desc, "data-eq-desc"),
+        price: getText(price, "data-eq-price"),
+        contactName: getText(cName, "data-eq-cname"),
+        contactTel: getText(cTel, "data-eq-ctel"),
+        contactEmail: getText(cEmail, "data-eq-cemail")
+      };
+    });
+  }
+
   // ===== 共通ユーティリティ =====
 
   function makeFileInput(onFile) {
@@ -280,11 +419,19 @@
     return pencil;
   }
 
+  function makeDeleteButton(onClick) {
+    var btn = document.createElement("button");
+    btn.className = "ck-delete-item";
+    btn.type = "button";
+    btn.title = "削除";
+    btn.textContent = "✕";
+    btn.addEventListener("click", function (e) { e.preventDefault(); onClick(); });
+    return btn;
+  }
+
   function readAndUpload(file, onDone) {
     var reader = new FileReader();
-    reader.onload = function () {
-      uploadImage(file.name, reader.result, onDone);
-    };
+    reader.onload = function () { uploadImage(file.name, reader.result, onDone); };
     reader.readAsDataURL(file);
   }
 
@@ -316,6 +463,8 @@
     if (saveBtn) saveBtn.classList.add("ck-dirty");
   }
 
+  // ===== 保存バー =====
+
   function addSaveBar() {
     if (document.getElementById("ck-save-bar")) return;
     var bar = document.createElement("div");
@@ -344,6 +493,8 @@
     document.body.appendChild(bar);
   }
 
+  // ===== 保存 =====
+
   function setValue(obj, path, value) {
     var parts = path.split(".");
     var last = parts.pop();
@@ -358,6 +509,7 @@
     fetch("content.json", { cache: "no-store" })
       .then(function (res) { return res.json(); })
       .then(function (contentData) {
+        // data-ck テキスト要素
         document.querySelectorAll("[data-ck]").forEach(function (el) {
           var key = el.getAttribute("data-ck");
           var savedValue = el.getAttribute("data-ck-text");
@@ -365,21 +517,28 @@
           setValue(contentData, key, savedValue);
         });
 
+        // スライドショー
         var slideshow = document.getElementById("hero-slideshow");
         if (slideshow) {
-          var paths = Array.from(slideshow.querySelectorAll(".slide")).map(function (img) {
+          contentData.slideshow = Array.from(slideshow.querySelectorAll(".slide")).map(function (img) {
             return img.getAttribute("data-slide-path") || img.getAttribute("src");
           });
-          contentData.slideshow = paths;
         }
 
-        // 設置事例ギャラリー保存
+        // 設置事例ギャラリー
         var gachaGrid = document.getElementById("products-gacha-grid");
         var vendGrid = document.getElementById("products-vend-grid");
         if (gachaGrid || vendGrid) {
           contentData.products = contentData.products || {};
           if (gachaGrid) contentData.products.gacha = collectProductsItems(gachaGrid);
           if (vendGrid) contentData.products.vend = collectProductsItems(vendGrid);
+        }
+
+        // 貸し出し機器一覧
+        var eqList = document.getElementById("equipment-list");
+        if (eqList) {
+          contentData.equipment = contentData.equipment || {};
+          contentData.equipment.items = collectEquipmentItems(eqList);
         }
 
         return fetch("/.netlify/functions/save-content", {
