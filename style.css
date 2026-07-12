@@ -753,6 +753,72 @@ body.ck-edit-mode [data-ck]:not([data-ck-attr]) {
   color: #ffffff;
 }
 
+/* ===== お願いバナー ===== */
+.request-banner-bg {
+  background: linear-gradient(135deg, #fff8e8 0%, #fff3d6 100%);
+  border-top: 3px solid #e8a820;
+  border-bottom: 3px solid #e8a820;
+}
+
+.request-banner {
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: 24px 28px;
+}
+
+.request-banner-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.request-banner-icon {
+  font-size: 24px;
+  line-height: 1;
+}
+
+.request-banner-title {
+  margin: 0;
+  font-size: 18px;
+  font-weight: bold;
+  color: #7a4a00;
+  position: relative;
+}
+
+.request-banner-body {
+  font-size: 14px;
+  line-height: 1.9;
+  color: #4a3200;
+  background-color: rgba(255,255,255,0.6);
+  border-left: 4px solid #e8a820;
+  padding: 14px 18px;
+  border-radius: 0 6px 6px 0;
+  margin-bottom: 18px;
+  position: relative;
+}
+
+.request-banner-footer {
+  text-align: center;
+}
+
+.request-banner-btn {
+  display: inline-block;
+  background: linear-gradient(135deg, #e8a820 0%, #c98000 100%);
+  color: #ffffff;
+  font-weight: bold;
+  padding: 12px 32px;
+  border-radius: 4px;
+  text-decoration: none;
+  font-size: 14px;
+  box-shadow: 0 3px 8px rgba(200, 130, 0, 0.35);
+}
+
+.request-banner-btn:hover {
+  background: linear-gradient(135deg, #c98000 0%, #a86800 100%);
+  color: #ffffff;
+}
+
 /* ===== 貸し出し機器一覧 ===== */
 #equipment-list {
   display: flex;
