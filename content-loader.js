@@ -58,6 +58,48 @@
         renderProductsGrid("products-vend-grid", data.products.vend);
       }
 
+      // 会社の歴史タイムライン
+      function renderHistoryTimeline(items) {
+        var tl = document.getElementById("history-timeline");
+        if (!tl) return;
+        tl.innerHTML = "";
+        (items || []).forEach(function (item) {
+          var row = document.createElement("div");
+          row.className = "ht-item";
+
+          var year = document.createElement("div");
+          year.className = "ht-year";
+          year.textContent = item.year || "";
+          year.setAttribute("data-ht-year", item.year || "");
+
+          var dot = document.createElement("div");
+          dot.className = "ht-dot";
+
+          var body = document.createElement("div");
+          body.className = "ht-body";
+
+          var title = document.createElement("div");
+          title.className = "ht-title";
+          title.textContent = item.title || "";
+          title.setAttribute("data-ht-title", item.title || "");
+
+          var desc = document.createElement("div");
+          desc.className = "ht-desc";
+          desc.textContent = item.desc || "";
+          desc.setAttribute("data-ht-desc", item.desc || "");
+
+          body.appendChild(title);
+          body.appendChild(desc);
+          row.appendChild(year);
+          row.appendChild(dot);
+          row.appendChild(body);
+          tl.appendChild(row);
+        });
+      }
+      if (data.history) {
+        renderHistoryTimeline(data.history.items);
+      }
+
       // 貸し出し機器一覧
       function renderEquipmentList(items) {
         var list = document.getElementById("equipment-list");

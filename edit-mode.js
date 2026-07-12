@@ -19,6 +19,10 @@
     if (gachaGrid) enableProductsGridEditing(gachaGrid);
     if (vendGrid) enableProductsGridEditing(vendGrid);
 
+    // 会社の歴史タイムライン
+    var htTimeline = document.getElementById("history-timeline");
+    if (htTimeline) enableHistoryEditing(htTimeline);
+
     // 貸し出し機器一覧
     var eqList = document.getElementById("equipment-list");
     if (eqList) enableEquipmentEditing(eqList);
@@ -204,6 +208,101 @@
         name: name || ""
       };
     });
+  }
+
+  // ===== 会社の歴史タイムライン =====
+
+  function enableHistoryEditing(tl) {
+    Array.from(tl.querySelectorAll(".ht-item")).forEach(attachHistoryItemControls);
+    addHistoryAddButton(tl);
+  }
+
+  function attachHistoryItemControls(row) {
+    var year = row.querySelector(".ht-year");
+    var title = row.querySelector(".ht-title");
+    var desc = row.querySelector(".ht-desc");
+
+    attachFieldPencil(year, "data-ht-year", false);
+    attachFieldPencil(title, "data-ht-title", false);
+    attachFieldPencil(desc, "data-ht-desc", true);
+
+    var delBtn = makeDeleteButton(function () {
+      if (confirm("この項目を削除しますか？")) { row.remove(); markDirty(); }
+    });
+    delBtn.style.position = "absolute";
+    delBtn.style.top = "4px";
+    delBtn.style.right = "4px";
+    var body = row.querySelector(".ht-body");
+    if (body) { body.style.position = "relative"; body.appendChild(delBtn); }
+  }
+
+  function addHistoryAddButton(tl) {
+    var wrapper = document.createElement("div");
+    wrapper.className = "ht-add-wrapper";
+    var addBtn = document.createElement("button");
+    addBtn.className = "ck-add-item";
+    addBtn.type = "button";
+    addBtn.textContent = "＋ 追加";
+    addBtn.addEventListener("click", function () {
+      var row = document.createElement("div");
+      row.className = "ht-item";
+
+      var year = document.createElement("div");
+      year.className = "ht-year";
+      year.textContent = "";
+      year.setAttribute("data-ht-year", "");
+
+      var dot = document.createElement("div");
+      dot.className = "ht-dot";
+
+      var body = document.createElement("div");
+      body.className = "ht-body";
+      body.style.position = "relative";
+
+      var title = document.createElement("div");
+      title.className = "ht-title";
+      title.textContent = "";
+      title.setAttribute("data-ht-title", "");
+
+      var desc = document.createElement("div");
+      desc.className = "ht-desc";
+      desc.textContent = "";
+      desc.setAttribute("data-ht-desc", "");
+
+      body.appendChild(title);
+      body.appendChild(desc);
+      row.appendChild(year);
+      row.appendChild(dot);
+      row.appendChild(body);
+      tl.insertBefore(row, wrapper);
+      attachHistoryItemControls(row);
+      markDirty();
+    });
+    wrapper.appendChild(addBtn);
+    tl.appendChild(wrapper);
+  }
+
+  function collectHistoryItems(tl) {
+    return Array.from(tl.querySelectorAll(".ht-item")).map(function (row) {
+      var year = row.querySelector(".ht-year");
+      var title = row.querySelector(".ht-title");
+      var desc = row.querySelector(".ht-desc");
+      return {
+        year: getAttrOrText(year, "data-ht-year"),
+        title: getAttrOrText(title, "data-ht-title"),
+        desc: getAttrOrText(desc, "data-ht-desc")
+      };
+    });
+  }
+
+  function getAttrOrText(el, attr) {
+    if (!el) return "";
+    var v = el.getAttribute(attr);
+    if (v !== null) return v;
+    return Array.from(el.childNodes)
+      .filter(function (n) { return n.nodeType === Node.TEXT_NODE; })
+      .map(function (n) { return n.textContent; })
+      .join("").trim();
   }
 
   // ===== 貸し出し機器一覧 =====
@@ -555,6 +654,13 @@
           contentData.products = contentData.products || {};
           if (gachaGrid) contentData.products.gacha = collectProductsItems(gachaGrid);
           if (vendGrid) contentData.products.vend = collectProductsItems(vendGrid);
+        }
+
+        // 会社の歴史
+        var htTimeline = document.getElementById("history-timeline");
+        if (htTimeline) {
+          contentData.history = contentData.history || {};
+          contentData.history.items = collectHistoryItems(htTimeline);
         }
 
         // 貸し出し機器一覧
