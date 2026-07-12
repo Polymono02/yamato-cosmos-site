@@ -1,18 +1,33 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-    <loc>https://example.netlify.app/index.html</loc>
+    <loc>https://snazzy-pastelito-931d9d.netlify.app/</loc>
+    <changefreq>weekly</changefreq>
+    <priority>1.0</priority>
   </url>
   <url>
-    <loc>https://example.netlify.app/company.html</loc>
+    <loc>https://snazzy-pastelito-931d9d.netlify.app/company.html</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://example.netlify.app/business.html</loc>
+    <loc>https://snazzy-pastelito-931d9d.netlify.app/business.html</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://example.netlify.app/products.html</loc>
+    <loc>https://snazzy-pastelito-931d9d.netlify.app/products.html</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://example.netlify.app/contact.html</loc>
+    <loc>https://snazzy-pastelito-931d9d.netlify.app/equipment.html</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://snazzy-pastelito-931d9d.netlify.app/contact.html</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
   </url>
 </urlset>

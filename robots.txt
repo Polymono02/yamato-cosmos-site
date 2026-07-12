@@ -1,4 +1,6 @@
 User-agent: *
 Allow: /
+Disallow: /admin/
+Disallow: /.netlify/
 
-Sitemap: https://example.netlify.app/sitemap.xml
+Sitemap: https://snazzy-pastelito-931d9d.netlify.app/sitemap.xml
