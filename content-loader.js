@@ -67,10 +67,26 @@
           var row = document.createElement("div");
           row.className = "ht-item";
 
+          var yearCol = document.createElement("div");
+          yearCol.className = "ht-year-col";
+
           var year = document.createElement("div");
           year.className = "ht-year";
           year.textContent = item.year || "";
           year.setAttribute("data-ht-year", item.year || "");
+
+          var logoWrap = document.createElement("div");
+          logoWrap.className = "ht-logo-wrap";
+          var logoImg = document.createElement("img");
+          logoImg.className = "ht-logo";
+          logoImg.src = item.logo || "";
+          logoImg.setAttribute("data-ht-logo", item.logo || "");
+          logoImg.alt = "ロゴ";
+          if (!item.logo) logoImg.style.display = "none";
+          logoWrap.appendChild(logoImg);
+
+          yearCol.appendChild(year);
+          yearCol.appendChild(logoWrap);
 
           var dot = document.createElement("div");
           dot.className = "ht-dot";
@@ -90,7 +106,7 @@
 
           body.appendChild(title);
           body.appendChild(desc);
-          row.appendChild(year);
+          row.appendChild(yearCol);
           row.appendChild(dot);
           row.appendChild(body);
           tl.appendChild(row);

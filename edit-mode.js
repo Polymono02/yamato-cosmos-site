@@ -213,7 +213,10 @@
   // ===== 会社の歴史タイムライン =====
 
   function enableHistoryEditing(tl) {
-    Array.from(tl.querySelectorAll(".ht-item")).forEach(attachHistoryItemControls);
+    Array.from(tl.querySelectorAll(".ht-item")).forEach(function (row) {
+      attachHistoryItemControls(row);
+      attachHistoryDragHandle(row, tl);
+    });
     addHistoryAddButton(tl);
   }
 
@@ -221,6 +224,24 @@
     var year = row.querySelector(".ht-year");
     var title = row.querySelector(".ht-title");
     var desc = row.querySelector(".ht-desc");
+    var logoWrap = row.querySelector(".ht-logo-wrap");
+    var logoImg = row.querySelector(".ht-logo");
+
+    // ロゴ画像アップロード
+    if (logoWrap && logoImg) {
+      var logoFileInput = makeFileInput(function (file) {
+        readAndUpload(file, function (newPath) {
+          logoImg.src = newPath;
+          logoImg.setAttribute("data-ht-logo", newPath);
+          logoImg.style.display = "";
+          markDirty();
+        });
+      });
+      var logoPencil = makePencilButton("ロゴ画像を設定", function () { logoFileInput.click(); });
+      logoPencil.classList.add("ck-pencil-image", "ck-pencil-ht-logo");
+      logoWrap.appendChild(logoPencil);
+      logoWrap.appendChild(logoFileInput);
+    }
 
     attachFieldPencil(year, "data-ht-year", false);
     attachFieldPencil(title, "data-ht-title", false);
@@ -236,6 +257,54 @@
     if (body) { body.style.position = "relative"; body.appendChild(delBtn); }
   }
 
+  function attachHistoryDragHandle(row, tl) {
+    var handle = document.createElement("button");
+    handle.className = "ht-drag-handle";
+    handle.type = "button";
+    handle.title = "ドラッグして並び替え";
+    handle.textContent = "⠿";
+
+    handle.addEventListener("mousedown", function () {
+      row.setAttribute("draggable", "true");
+    });
+
+    row.addEventListener("dragstart", function (e) {
+      e.dataTransfer.effectAllowed = "move";
+      e.dataTransfer.setData("text/plain", "ht-drag");
+      row.classList.add("ht-dragging");
+    });
+
+    row.addEventListener("dragend", function () {
+      row.setAttribute("draggable", "false");
+      row.classList.remove("ht-dragging");
+      Array.from(tl.querySelectorAll(".ht-drag-over-top, .ht-drag-over-bottom")).forEach(function (el) {
+        el.classList.remove("ht-drag-over-top", "ht-drag-over-bottom");
+      });
+      markDirty();
+    });
+
+    row.addEventListener("dragover", function (e) {
+      e.preventDefault();
+      var dragging = tl.querySelector(".ht-dragging");
+      if (!dragging || dragging === row) return;
+      Array.from(tl.querySelectorAll(".ht-drag-over-top, .ht-drag-over-bottom")).forEach(function (el) {
+        el.classList.remove("ht-drag-over-top", "ht-drag-over-bottom");
+      });
+      var rect = row.getBoundingClientRect();
+      if (e.clientY < rect.top + rect.height / 2) {
+        row.classList.add("ht-drag-over-top");
+        tl.insertBefore(dragging, row);
+      } else {
+        row.classList.add("ht-drag-over-bottom");
+        var next = row.nextSibling;
+        tl.insertBefore(dragging, next);
+      }
+    });
+
+    var body = row.querySelector(".ht-body");
+    if (body) body.appendChild(handle);
+  }
+
   function addHistoryAddButton(tl) {
     var wrapper = document.createElement("div");
     wrapper.className = "ht-add-wrapper";
@@ -247,10 +316,25 @@
       var row = document.createElement("div");
       row.className = "ht-item";
 
+      var yearCol = document.createElement("div");
+      yearCol.className = "ht-year-col";
+
       var year = document.createElement("div");
       year.className = "ht-year";
       year.textContent = "";
       year.setAttribute("data-ht-year", "");
+
+      var logoWrap = document.createElement("div");
+      logoWrap.className = "ht-logo-wrap";
+      var logoImg = document.createElement("img");
+      logoImg.className = "ht-logo";
+      logoImg.src = "";
+      logoImg.setAttribute("data-ht-logo", "");
+      logoImg.style.display = "none";
+      logoWrap.appendChild(logoImg);
+
+      yearCol.appendChild(year);
+      yearCol.appendChild(logoWrap);
 
       var dot = document.createElement("div");
       dot.className = "ht-dot";
@@ -271,11 +355,12 @@
 
       body.appendChild(title);
       body.appendChild(desc);
-      row.appendChild(year);
+      row.appendChild(yearCol);
       row.appendChild(dot);
       row.appendChild(body);
       tl.insertBefore(row, wrapper);
       attachHistoryItemControls(row);
+      attachHistoryDragHandle(row, tl);
       markDirty();
     });
     wrapper.appendChild(addBtn);
@@ -287,10 +372,12 @@
       var year = row.querySelector(".ht-year");
       var title = row.querySelector(".ht-title");
       var desc = row.querySelector(".ht-desc");
+      var logoImg = row.querySelector(".ht-logo");
       return {
         year: getAttrOrText(year, "data-ht-year"),
         title: getAttrOrText(title, "data-ht-title"),
-        desc: getAttrOrText(desc, "data-ht-desc")
+        desc: getAttrOrText(desc, "data-ht-desc"),
+        logo: (logoImg && logoImg.getAttribute("data-ht-logo")) || ""
       };
     });
   }

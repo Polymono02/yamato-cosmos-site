@@ -104,7 +104,9 @@ a:hover {
 
 /* ===== アイコンナビ ===== */
 .nav-bar {
-  background: linear-gradient(135deg, #6c84c4 0%, #4a63a8 100%);
+  background:
+    linear-gradient(to bottom, rgba(255,255,255,0.22) 0%, rgba(255,255,255,0) 38%),
+    linear-gradient(135deg, #6c84c4 0%, #4a63a8 100%);
 }
 
 .nav-bar ul {
@@ -777,15 +779,48 @@ body.ck-edit-mode [data-ck]:not([data-ck-attr]) {
   align-items: flex-start;
 }
 
-.ht-year {
+.ht-year-col {
   width: 80px;
   flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+
+.ht-year {
   font-size: 14px;
   font-weight: bold;
   color: #2e3f73;
   text-align: right;
   padding-top: 4px;
   position: relative;
+  width: 100%;
+}
+
+.ht-logo-wrap {
+  width: 100%;
+  text-align: right;
+  margin-top: 6px;
+}
+
+.ht-logo {
+  max-width: 74px;
+  max-height: 54px;
+  object-fit: contain;
+  display: block;
+  margin-left: auto;
+  border-radius: 3px;
+}
+
+.ck-pencil-ht-logo {
+  display: none;
+  margin-top: 4px;
+  font-size: 11px !important;
+  padding: 2px 4px !important;
+}
+
+.ck-edit-mode .ck-pencil-ht-logo {
+  display: block;
 }
 
 .ht-dot {
@@ -833,6 +868,41 @@ body.ck-edit-mode [data-ck]:not([data-ck-attr]) {
   line-height: 1.7;
   position: relative;
   padding-right: 28px;
+}
+
+.ht-drag-handle {
+  display: none;
+  position: absolute;
+  top: 4px;
+  right: 32px;
+  cursor: grab;
+  color: #9aa4c4;
+  font-size: 18px;
+  line-height: 1;
+  padding: 2px 4px;
+  border-radius: 3px;
+  user-select: none;
+}
+
+.ck-edit-mode .ht-drag-handle {
+  display: block;
+}
+
+.ht-drag-handle:hover {
+  background: rgba(108,132,196,0.12);
+  color: #4a63a8;
+}
+
+.ht-item.ht-dragging {
+  opacity: 0.4;
+}
+
+.ht-item.ht-drag-over-top {
+  border-top: 3px solid #6c84c4;
+}
+
+.ht-item.ht-drag-over-bottom {
+  border-bottom: 3px solid #6c84c4;
 }
 
 .ht-add-wrapper {
